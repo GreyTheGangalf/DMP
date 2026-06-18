@@ -3,6 +3,7 @@ import customtkinter as ctk
 import threading
 from downloader import dmp_downloader
 import requests
+import os
 
 def download_process(data):
     if data['status'] == 'downloading':
@@ -44,8 +45,19 @@ def video_download(target_url):
 def smart_router(url):
     print("\n [Router] Communicating with server...")
 
+   
+
+    platforms=["youtube.com", "youtu.be", "twitter.com", "x.com", "instagram.com", "tiktok.com", "vimeo.com", "reddit.com", "yandex"]
+
+    if any(site in url for site in platforms):
+        print("[ROUTER] Link is from common platforms. yt-dlp ")
+        video_download(url)
+        return
+        
     try:
-        answer = requests.head(url, allow_redirects=True, timeout=5)
+        agent_Headers ={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
+        agent_Answer = requests.head(url, allow_redirects=True,timeout=5,headers=agent_Headers)
 
         content_type = answer.headers.get('Content-Type','').lower()
         print(f"[Router] Content type: {content_type}")
@@ -71,6 +83,15 @@ def download_button_clicked():
         worker.start()
     else:
         print("Invalid URL. Try again")
+
+def open_folder():
+    current_folder = os.getcwd()
+
+    try:
+        os.startfile(current_folder)
+        status_label.configure(text="📁 Downloads folder opened.")
+    except Exception as e:
+        status_label.configure(text=f"Error: File couldn't open ({e})")
 
 # video_URL = input("Enter the video's URL:")
 
@@ -100,5 +121,14 @@ status_label.pack(pady=10)
 progress_label = ctk.CTkProgressBar(app, width=400)
 progress_label.set(0)
 progress_label.pack(pady=10)
+
+folder_button = ctk.CTkButton(
+    app,
+    text="📁 Open Downloads",
+    command=open_folder,
+    fg_color="#4A4D50",    
+    hover_color="#3b3d3f"
+)
+folder_button.pack(pady=5)
 
 app.mainloop()
