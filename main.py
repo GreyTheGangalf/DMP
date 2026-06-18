@@ -5,6 +5,13 @@ from downloader import dmp_downloader
 import requests
 import os
 
+dest_folder = os.path.join(os.path.expanduser("~"), "Downloads", "DMP_Downloads")
+
+if not os.path.exists(dest_folder):
+    os.makedirs(dest_folder)
+
+os.chdir(dest_folder)
+
 cancel_flag = threading.Event()
 
 def download_process(data):
