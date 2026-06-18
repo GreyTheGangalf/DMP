@@ -1,6 +1,7 @@
 import yt_dlp
 import customtkinter as ctk
 import threading
+from downloader import dmp_downloader
 
 def download_process(data):
     if data['status'] == 'downloading':
@@ -40,12 +41,17 @@ def video_download(target_url):
         ydl.download([target_url])
 
 def download_button_clicked():
-    selected_url = url__input.get()
+    selected_url = url__input.get().strip()
 
     if selected_url.startswith("http"):
-        print("Starting download in background")
+        status_label.configure(text= "Analyzing connection & selecting engine...")
 
-        worker = threading.Thread(target=video_download,args=(selected_url,))
+        if "youtube.com" in selected_url or "youtu.be" in selected_url:
+            print("Platform has been detected, starting yt-dlp...")
+            worker = threading.Thread(target=video_download, args=(selected_url,))
+        else:
+            print("Direct Link detected, DMP_Downloader is running...")
+            worker = threading.Thread(target= dmp_downloader ,args=(selected_url, 4))
 
         worker.start()
     else:
