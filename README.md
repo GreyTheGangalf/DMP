@@ -4,6 +4,8 @@ A modern, hybrid, and multi-threaded Download Manager built with Python and Cust
 
 DMP Downloader is not just a simple URL fetcher; it features an intelligent routing architecture that automatically analyzes network requests and selects the best underlying engine to download the content at maximum speed.
 
+<img width="737" height="527" alt="Ekran görüntüsü 2026-06-19 005422" src="https://github.com/user-attachments/assets/add7d488-e8f2-4e9f-a372-97d9b8981b2c" />
+
 ## ✨ Features
 
 * **🧠 Smart Routing Architecture:** Automatically performs an HTTP `HEAD` request to analyze the `Content-Type`. It dynamically routes the traffic to the appropriate download engine without requiring user intervention.
