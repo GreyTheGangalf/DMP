@@ -2,7 +2,7 @@ import requests
 import threading
 import os
 
-def dmp_downloader(url, connection_num = 4):
+def dmp_downloader(url, connection_num = 4 , cancel_flag=None):
     total_size, pieces_support = file_info(url)
 
     if not pieces_support:
@@ -13,18 +13,25 @@ def dmp_downloader(url, connection_num = 4):
     workers = []
 
     for i, (start,end) in enumerate(pieces):
-        worker = threading.Thread(target=download_worker,args=(url,start,end,i))
+        worker = threading.Thread(target=download_worker,args=(url,start,end,i,cancel_flag))
         workers.append(worker)
         worker.start()
 
         for worker in workers:
             worker.join()
 
-        print(f"All workers did their job and pieces are written on the disc!")
+    if cancel_flag and cancel_flag.is_set():
+        print("\n [CLEANING] Deleting pieces")
+        for i in range(connection_num):
+            file = f"temp_part{i}.dmp"
+            if os.path.exists(file):
+                os.remove(file)
+        return
+    print(f"All workers did their job and pieces are written on the disc!")
 
-        file_name = url.split('/')[-1]
+    file_name = url.split('/')[-1]
 
-        merge_files(file_name,connection_num)
+    merge_files(file_name,connection_num)
 
 def file_info(url):
     answer = requests.head(url, allow_redirects=True)
@@ -58,7 +65,7 @@ def calculate_pieces(total_size , connection_num = 4):
     
     return pieces
 
-def download_worker(url,start,end,part_num):
+def download_worker(url,start,end,part_num,cancel_flag=None):
     headers={'Range' : f'bytes={start}-{end}'}
     print(f"Starting part {part_num} 's download ({start}-{end})...")
 
@@ -68,6 +75,10 @@ def download_worker(url,start,end,part_num):
 
     with open(fileName, "wb") as file:
         for chunk in response.iter_content(chunk_size=8192):
+            if cancel_flag and cancel_flag.is_set():
+                print(f"Part {part_num} is cancelling.")
+                return
+
             if chunk:
                 file.write(chunk)
     

@@ -5,6 +5,8 @@ from downloader import dmp_downloader
 import requests
 import os
 
+cancel_flag = threading.Event()
+
 def download_process(data):
     if data['status'] == 'downloading':
         progress = data.get('_percent_str', '0%').strip()
@@ -26,6 +28,10 @@ def download_process(data):
 
 
 def video_download(target_url):
+    def progress_hook(d):
+        if cancel_flag.is_set():
+            raise Exception("Cancelled")
+    
     settings={
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'merge_output_format': 'mp4',
@@ -36,16 +42,29 @@ def video_download(target_url):
 
         'quiet': False, 
         'no_warnings': True,
-        'progress_hooks': [download_process],
+        'progress_hooks': [download_process,progress_hook],
+        'nopart':False,
     }
 
-    with yt_dlp.YoutubeDL(settings) as ydl:
-        ydl.download([target_url])
+    try:
+        with yt_dlp.YoutubeDL(settings) as ydl:
+            ydl.download([target_url])
+
+        if not cancel_flag.is_set():
+            print("\n[SUCCESS] yt-dlp download is complete!")
+            status_label.configure(text="✅ Video downloaded!")
+    
+    except Exception as e:
+        if "Cancelled" in str(e):
+            print("\n[CLEANİNG] yt-dlp download cancelled!")
+            status_label.configure(text="❌ Download cancelled.")
+        else:
+            print(f"\n[Error] yt-dlp has run to an error: {e}")
+            status_label.configure(text="Error: Can't download the video.")
 
 def smart_router(url):
     print("\n [Router] Communicating with server...")
 
-   
 
     platforms=["youtube.com", "youtu.be", "twitter.com", "x.com", "instagram.com", "tiktok.com", "vimeo.com", "reddit.com", "yandex"]
 
@@ -67,11 +86,17 @@ def smart_router(url):
             video_download(url)
         else:
             print("[ROUTER] media file detected. DMP-Downloader")
-            dmp_downloader(url,4)
+            dmp_downloader(url,4,cancel_flag)
 
     except Exception as e:
         print(f"[ROUTER] Couldn't anaylze the file. {e}"),
 
+
+def cancel_download():
+    status_label.configure(text="Canceling... Please wait.")
+    cancel_flag.set()
+
+cancel_flag.clear()
 
 def download_button_clicked():
     selected_url = url__input.get().strip()
@@ -130,5 +155,14 @@ folder_button = ctk.CTkButton(
     hover_color="#3b3d3f"
 )
 folder_button.pack(pady=5)
+
+cancel_button = ctk.CTkButton(
+    app,
+    text="❌ Cancel",
+    command= cancel_download,
+    fg_color="#8B0000",      
+    hover_color="#a30000"    
+)
+cancel_button.pack(pady=5)
 
 app.mainloop()
