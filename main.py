@@ -2,6 +2,7 @@ import yt_dlp
 import customtkinter as ctk
 import threading
 from downloader import dmp_downloader
+import requests
 
 def download_process(data):
     if data['status'] == 'downloading':
@@ -40,19 +41,33 @@ def video_download(target_url):
     with yt_dlp.YoutubeDL(settings) as ydl:
         ydl.download([target_url])
 
+def smart_router(url):
+    print("\n [Router] Communicating with server...")
+
+    try:
+        answer = requests.head(url, allow_redirects=True, timeout=5)
+
+        content_type = answer.headers.get('Content-Type','').lower()
+        print(f"[Router] Content type: {content_type}")
+
+        if 'text/html' in content_type:
+            print("[ROUTER] HTML detected. yt-dlp")
+            video_download(url)
+        else:
+            print("[ROUTER] media file detected. DMP-Downloader")
+            dmp_downloader(url,4)
+
+    except Exception as e:
+        print(f"[ROUTER] Couldn't anaylze the file. {e}"),
+
+
 def download_button_clicked():
     selected_url = url__input.get().strip()
 
     if selected_url.startswith("http"):
-        status_label.configure(text= "Analyzing connection & selecting engine...")
+        status_label.configure(text= "Analyzing connection on network...")
 
-        if "youtube.com" in selected_url or "youtu.be" in selected_url:
-            print("Platform has been detected, starting yt-dlp...")
-            worker = threading.Thread(target=video_download, args=(selected_url,))
-        else:
-            print("Direct Link detected, DMP_Downloader is running...")
-            worker = threading.Thread(target= dmp_downloader ,args=(selected_url, 4))
-
+        worker = threading.Thread(target=smart_router,args=(selected_url,))
         worker.start()
     else:
         print("Invalid URL. Try again")
