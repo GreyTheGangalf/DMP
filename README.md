@@ -60,5 +60,4 @@ If it returns a file format (e.g., application/octet-stream), it triggers the cu
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
 📝 License
-This project is open-source and available under the MIT License.<img width="737" height="527" alt="Ekran görüntüsü 2026-06-19 005422" src="https://github.com/user-attachments/assets/49f0d90e-38be-4506-bb0f-03b6c1d6683e" />
-<img width="740" height="527" alt="image" src="https://github.com/user-attachments/assets/44082058-4217-4c4f-a005-d6caed44d005" />
+This project is open-source and available under the MIT License.
