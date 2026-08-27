@@ -7,6 +7,8 @@
 
 > **High-Performance Multi-Threaded Download Manager** — Built for speed, designed for simplicity. Download videos from YouTube, direct files, and more with intelligent routing.
 
+<img width="737" height="527" alt="Ekran görüntüsü 2026-06-19 005422" src="https://github.com/user-attachments/assets/add7d488-e8f2-4e9f-a372-97d9b8981b2c" />
+
 ---
 
 ## ✨ What Makes DMP Different?
