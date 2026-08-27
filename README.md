@@ -14,7 +14,7 @@
 | Feature | DMP | IDM | Others |
 |---------|-----|-----|--------|
 | **Smart Routing** | ✅ Auto-detects content type | ❌ | ❌ |
-| **Multi-threaded** | ✅ 4-8 parallel connections | ✅ | ✅ |
+| **Multi-threaded** | ✅ 4-8 Parallel connections | ✅ | ✅ |
 | **Video Extraction** | ✅ YouTube, Twitter, Instagram | ✅ (paid) | ❌ |
 | **Modern GUI** | ✅ Dark mode, CustomTkinter | ❌ | Varies |
 | **Open Source** | ✅ 100% free | ❌ | Varies |
@@ -27,15 +27,15 @@
 # Clone and run in 30 seconds
 git clone https://github.com/GreyTheGangalf/DMP.git
 cd DMP
-pip install -r requirements.txt
+pip install requests yt-dlp customtkinter
 python main.py
 ```
 
 **What you'll see:**
 1. Paste any URL (YouTube, direct file, etc.)
 2. Click Download
-3. Smart engine automatically selects best protocol
-4. Watch real-time progress with multi-threaded visualization
+3. Smart engine automatically selects the best protocol
+4. Files are saved seamlessly to your Downloads/DMP_Indirilenler folder
 
 ---
 
@@ -43,7 +43,7 @@ python main.py
 
 ```
 ┌─────────────────────────────────────────┐
-│     User Input (URL + Save Path)        │
+│            User Input (URL)             │
 └──────────────────┬──────────────────────┘
                    │
                    ▼
@@ -72,40 +72,39 @@ python main.py
 
 ## 🔧 Features Explained
 
-### 1️⃣ **Smart Routing Architecture**
-- Performs HTTP `HEAD` request to analyze `Content-Type`
-- Routes to appropriate engine automatically
-- Zero user configuration needed
+### 1️⃣ Smart Routing Architecture
+- Performs HTTP HEAD request with mock User-Agents
+- Analyzes Content-Type and bypasses geo-blocks
+- Routes to appropriate engine automatically (Zero user configuration needed)
 
-### 2️⃣ **Multi-Threaded Download Engine**
-```python
-# Example: Download 100MB file
-# Standard: 100MB → 1 connection = ~20s
-# DMP:     100MB → 8 connections = ~3s (80% faster!)
+### 2️⃣ Multi-Threaded Download Engine
+
+```
+# Standard: 1 connection = slower
+# DMP:      4-8 parallel TCP connections = Much faster!
 
 Worker Threads:
-  Thread 1: Bytes 0-12.5MB
-  Thread 2: Bytes 12.5-25MB
-  Thread 3: Bytes 25-37.5MB
-  ...
-  Thread 8: Bytes 87.5-100MB
+  Thread 1: Bytes 0-25%
+  Thread 2: Bytes 25%-50%
+  Thread 3: Bytes 50%-75%
+  Thread 4: Bytes 75%-100%
   → Merge all parts → Done!
 ```
 
-### 3️⃣ **Advanced Video Extraction**
+### 3️⃣ Advanced Video Extraction
 - Supports: YouTube, Twitter/X, Instagram, TikTok, Vimeo, Yandex
-- Bypasses anti-bot protections with `yt-dlp`
-- Auto-selects best quality available
+- Bypasses anti-bot protections seamlessly via yt-dlp
+- Extracts the best available quality automatically
 
-### 4️⃣ **Thread-Safe Cancellation**
-- Click "Cancel" → Gracefully stops all threads
-- Cleans up `.part` files automatically
-- No zombie processes or corrupted downloads
+### 4️⃣ Thread-Safe Cancellation
+- Click "Cancel" → Gracefully stops all active Python threads via threading.Event()
+- Catches internal hooks to stop yt-dlp instantly
+- Cleans up .part and .dmp temporary files automatically (No zombie processes)
 
-### 5️⃣ **Modern Dark-Mode GUI**
-- Built with CustomTkinter (modern Python GUI)
-- Real-time speed/progress visualization
-- Responsive and lightweight (~5MB)
+### 5️⃣ Modern Dark-Mode GUI
+- Built with CustomTkinter
+- "Open Downloads" one-click OS integration
+- No terminal clutter, fully visual experience
 
 ---
 
@@ -113,11 +112,11 @@ Worker Threads:
 
 ### Option 1: Windows Executable (Recommended)
 
-1. Download latest release: **[DMP_v1.2.exe](https://github.com/GreyTheGangalf/DMP/releases/download/v1.2/DMP_Downloader.exe)**
-2. Run it (no Python needed!)
-3. Start downloading
+1. Download the latest release from the [Releases](https://github.com/GreyTheGangalf/DMP/releases) tab
+2. Run `main.exe` (No Python installation required!)
+3. Start downloading immediately
 
-**Size:** 25MB | **Portable:** Yes | **Admin:** Not required
+**Size:** ~35MB | **Portable:** Yes | **Admin:** Not required
 
 ### Option 2: Run from Source
 
@@ -129,7 +128,7 @@ git clone https://github.com/GreyTheGangalf/DMP.git
 cd DMP
 
 # 2. Install dependencies
-pip install -r requirements.txt
+pip install requests yt-dlp customtkinter
 
 # 3. Run
 python main.py
@@ -139,37 +138,38 @@ python main.py
 
 ```bash
 # Prerequisites: PyInstaller installed
+pip install pyinstaller
 
-pyinstaller main.spec
-# Output: dist/DMP_Downloader.exe
+# Build the standalone UI app without the console:
+pyinstaller --noconsole --onefile --collect-all customtkinter main.py
+
+# Output will be generated in the dist/ folder.
 ```
 
 ---
 
 ## 🚀 Usage Guide
 
-### Basic Download (30 seconds)
+### Basic Download
 
-1. **Paste URL** → `https://example.com/file.zip`
-2. **Select Folder** → Choose save location
-3. **Click Download** → Watch magic happen ✨
+1. **Paste URL** → `https://example.com/file.zip` or `https://youtube.com/watch?v=...`
+2. **Click Download** → Watch the magic happen ✨
+3. **Open Folder** → Click "📁 İndirilenleri Aç" to view your file in Downloads/DMP_Indirilenler
 
 ### Supported URLs
 
 ```
 ✅ Direct Downloads
    https://example.com/file.zip
+   https://cdn.example.com/software.exe
    https://cdn.example.com/video.mp4
 
 ✅ Video Platforms
    https://youtube.com/watch?v=dQw4w9WgXcQ
    https://twitter.com/user/status/123456
    https://instagram.com/p/ABC123
+   https://yandex.com.tr/video/...
    https://tiktok.com/@user/video/123456
-
-✅ File Hosting
-   https://mega.nz/file/xyz
-   https://mediafire.com/file/xyz
 ```
 
 ---
@@ -180,9 +180,9 @@ pyinstaller main.spec
 |-----------|------------|
 | **Language** | Python 3.12+ |
 | **GUI** | CustomTkinter |
-| **Networking** | Requests, urllib3 |
+| **Networking** | Requests |
 | **Video Extraction** | yt-dlp |
-| **Threading** | Native Python threading |
+| **Concurrency** | Native Python threading |
 | **Packaging** | PyInstaller |
 
 ---
@@ -193,9 +193,8 @@ pyinstaller main.spec
 
 | Download Type | Size | Speed (Standard) | Speed (DMP) | Improvement |
 |---|---|---|---|---|
-| Video File | 500MB | 40 Mbps | 92 Mbps | **+130%** ⚡ |
-| Direct ZIP | 200MB | 35 Mbps | 78 Mbps | **+123%** ⚡ |
-| YouTube 1080p | 800MB | Network Dep. | Full Speed | **+45%** avg |
+| Direct EXE/ZIP | 200MB | 35 Mbps | 78 Mbps | **+123%** ⚡ |
+| Video Stream | 500MB | 40 Mbps | 92 Mbps | **+130%** ⚡ |
 
 ---
 
@@ -204,6 +203,7 @@ pyinstaller main.spec
 Love DMP? Help make it better!
 
 ### Ways to Contribute:
+
 1. **Report Bugs** → Found an issue? Create an [Issue](https://github.com/GreyTheGangalf/DMP/issues)
 2. **Suggest Features** → Have an idea? Discuss it in [Discussions](https://github.com/GreyTheGangalf/DMP/discussions)
 3. **Code** → Submit a [Pull Request](https://github.com/GreyTheGangalf/DMP/pulls)
@@ -232,13 +232,13 @@ git push origin feature/amazing-feature
 
 - [x] v1.0 — Core download engine with multi-threading
 - [x] v1.1 — Video extraction (yt-dlp integration)
-- [x] v1.2 — GUI improvements & bug fixes
+- [x] v1.2 — GUI improvements, Smart Routing & Safe Cancellation
 - [ ] **v2.0 — Coming Soon!**
-  - [ ] Resume downloads
+  - [ ] Pause/Resume functionality
   - [ ] Download queue management
   - [ ] Speed limiter
   - [ ] Batch downloads
-  - [ ] Browser integration
+  - [ ] Web API integration
   - [ ] Dark/Light theme toggle
 
 ---
@@ -253,7 +253,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - **yt-dlp** — Video extraction magic
 - **CustomTkinter** — Modern GUI toolkit
-- **Python community** — Amazing libraries
+- **Python Community** — For the amazing standard libraries
 
 ---
 
@@ -261,8 +261,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - **GitHub Issues** → [Report bugs](https://github.com/GreyTheGangalf/DMP/issues)
 - **Discussions** → [Chat & ideas](https://github.com/GreyTheGangalf/DMP/discussions)
-- **Email** → erkin.arikan@ozu.edu.tr
-- **LinkedIn** → [Erkin Arıkan](https://linkedin.com/in/erkin-arikan)
+- **LinkedIn** → [Erkin Arıkan](https://www.linkedin.com/in/erkin-arikan)
 
 ---
 
@@ -271,7 +270,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 If DMP helped you, consider giving it a ⭐ on GitHub! It motivates development and helps others discover the project.
 
 ```
-🌟 Star Count: [SUPPORT US]
+🌟 Star Count: Support us!
 📥 Downloads: 1.2K+
 👥 Contributors: 1
 ```
@@ -279,4 +278,3 @@ If DMP helped you, consider giving it a ⭐ on GitHub! It motivates development 
 ---
 
 **Made with ❤️ by [GreyTheGangalf](https://github.com/GreyTheGangalf)**
-
